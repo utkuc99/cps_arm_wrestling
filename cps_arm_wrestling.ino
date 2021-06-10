@@ -9,7 +9,7 @@
 #include "FS.h"
 
 //wifi
-const char* ssid     = "ESP8266-Access-Point";
+const char* ssid     = "CS350";
 const char* password = "123456789";
 
 //score
@@ -62,7 +62,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   <h2>CS350 Arm Wrestling</h2>
   <p>
     <span class="dht-labels">Player 1</span> 
-    <span id="temperature"></span>
+    <span id="perc"></span>
   </p><p>
   <img src="arm"></br>
   <progress id="file" value="32" max="100"> 32% </progress>
@@ -81,12 +81,12 @@ setInterval(function ( ) {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("temperature").innerHTML = this.responseText;
+      document.getElementById("perc").innerHTML = this.responseText;
       document.getElementById("humidity").innerHTML = 100 - this.responseText;
       document.getElementById("file").value = 100 - this.responseText;
     }
   };
-  xhttp.open("GET", "/temperature", true);
+  xhttp.open("GET", "/perc", true);
   xhttp.send();
 }, 100 ) ;
 
@@ -104,14 +104,7 @@ setInterval(function ( ) {
 </script>
 </html>)rawliteral";
 
-// Replaces placeholder with values
-String processor(const String& var){
-  //Serial.println(var);
-  if(var == "TEMPERATURE"){
-    return String(t);
-  }
-  return String();
-}
+
 
 void setup(){
   // Serial port
@@ -134,10 +127,10 @@ void setup(){
 
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", index_html, processor);
+    request->send_P(200, "text/html", index_html);
   });
   //Route for score
-  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/perc", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(t).c_str());
   });
   //Route for time
